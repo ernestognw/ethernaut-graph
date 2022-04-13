@@ -8,6 +8,7 @@ dataSources:
     source:
       address: "0xD991431D8b033ddCb84dAD257f4821E9d5b38C33"
       abi: Ethernaut
+      startBlock: 7536629
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
