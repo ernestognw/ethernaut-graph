@@ -16,7 +16,7 @@ export class LevelPlayed extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("level", Value.fromBytes(Bytes.empty()));
+    this.set("level", Value.fromString(""));
     this.set("player", Value.fromString(""));
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
   }
@@ -46,13 +46,13 @@ export class LevelPlayed extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get level(): Bytes {
+  get level(): string {
     let value = this.get("level");
-    return value!.toBytes();
+    return value!.toString();
   }
 
-  set level(value: Bytes) {
-    this.set("level", Value.fromBytes(value));
+  set level(value: string) {
+    this.set("level", Value.fromString(value));
   }
 
   get player(): string {
@@ -131,6 +131,88 @@ export class Player extends Entity {
 
   set address(value: Bytes) {
     this.set("address", Value.fromBytes(value));
+  }
+
+  get levelsPlayed(): Array<string> {
+    let value = this.get("levelsPlayed");
+    return value!.toStringArray();
+  }
+
+  set levelsPlayed(value: Array<string>) {
+    this.set("levelsPlayed", Value.fromStringArray(value));
+  }
+}
+
+export class Level extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("factory", Value.fromBytes(Bytes.empty()));
+    this.set("number", Value.fromBigInt(BigInt.zero()));
+    this.set("instancesCount", Value.fromBigInt(BigInt.zero()));
+    this.set("completionsCount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Level entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Level must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Level", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Level | null {
+    return changetype<Level | null>(store.get("Level", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get factory(): Bytes {
+    let value = this.get("factory");
+    return value!.toBytes();
+  }
+
+  set factory(value: Bytes) {
+    this.set("factory", Value.fromBytes(value));
+  }
+
+  get number(): BigInt {
+    let value = this.get("number");
+    return value!.toBigInt();
+  }
+
+  set number(value: BigInt) {
+    this.set("number", Value.fromBigInt(value));
+  }
+
+  get instancesCount(): BigInt {
+    let value = this.get("instancesCount");
+    return value!.toBigInt();
+  }
+
+  set instancesCount(value: BigInt) {
+    this.set("instancesCount", Value.fromBigInt(value));
+  }
+
+  get completionsCount(): BigInt {
+    let value = this.get("completionsCount");
+    return value!.toBigInt();
+  }
+
+  set completionsCount(value: BigInt) {
+    this.set("completionsCount", Value.fromBigInt(value));
   }
 
   get levelsPlayed(): Array<string> {

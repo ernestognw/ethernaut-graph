@@ -1,5 +1,5 @@
-import { LevelPlayed, Player } from "../generated/schema";
-import { getLevelPlayedId } from "./utils";
+import { LevelPlayed, Player, Level } from "../generated/schema";
+import { getLevelPlayedId, levelsToNumber } from "./utils";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 const createLevelPlayed = (
@@ -15,7 +15,7 @@ const createLevelPlayed = (
 
   const levelPlayed = new LevelPlayed(id);
   levelPlayed.player = player.toHex();
-  levelPlayed.level = level;
+  levelPlayed.level = level.toHex();
   levelPlayed.createdAt = createdAt;
   levelPlayed.save();
 };
@@ -43,4 +43,40 @@ const createPlayer = (address: Address): void => {
   player.save();
 };
 
-export { createLevelPlayed, createPlayer, completeLevelPlayed };
+const createLevel = (id: Address): void => {
+  if (Level.load(id.toHex())) return;
+
+  const level = new Level(id.toHex());
+  level.factory = id;
+  level.instancesCount = BigInt.fromI32(1);
+  level.completionsCount = BigInt.fromI32(0);
+  const number = levelsToNumber.get(id.toHex());
+  if (!number) return; // Unreachable code
+  level.number = number;
+  level.save();
+};
+
+const incrementLevelInstances = (id: Address): void => {
+  const level = Level.load(id.toHex());
+  if (!level) return;
+
+  level.instancesCount.plus(BigInt.fromI32(1));
+  level.save();
+};
+
+const incrementLevelCompletions = (id: Address): void => {
+  const level = Level.load(id.toHex());
+  if (!level) return;
+
+  level.completionsCount.plus(BigInt.fromI32(1));
+  level.save();
+};
+
+export {
+  createLevelPlayed,
+  createPlayer,
+  completeLevelPlayed,
+  createLevel,
+  incrementLevelInstances,
+  incrementLevelCompletions,
+};

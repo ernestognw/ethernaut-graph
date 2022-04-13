@@ -6,9 +6,9 @@ type LevelPlayed @entity {
   """
   id: ID!
   """
-  Level factory address
+  Level
   """
-  level: Bytes!
+  level: Level!
   """
   Player who started this instance
   """
@@ -25,7 +25,7 @@ type LevelPlayed @entity {
 
 type Player @entity {
   """
-  User ID
+  User ID is the address itself
   """
   id: ID!
   """
@@ -37,4 +37,31 @@ type Player @entity {
   It's limited to 1 per level due to contract Event limitations
   """
   levelsPlayed: [LevelPlayed!]! @derivedFrom(field: "player")
+}
+
+type Level @entity {
+  """
+  Level ID is the factory address
+  """
+  id: ID!
+  """
+  Factory address
+  """
+  factory: Bytes!
+  """
+  Level number
+  """
+  number: BigInt!
+  """
+  Amount of instances started for this level
+  """
+  instancesCount: BigInt!
+  """
+  Amount of completions for this level
+  """
+  completionsCount: BigInt!
+  """
+  List of plays for this level
+  """
+  levelsPlayed: [LevelPlayed!]! @derivedFrom(field: "level")
 }

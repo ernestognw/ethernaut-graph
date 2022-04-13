@@ -2,15 +2,24 @@ import {
   LevelCompletedLog,
   CreateLevelInstanceCall,
 } from "../generated/Ethernaut/Ethernaut";
-import { completeLevelPlayed, createLevelPlayed, createPlayer } from "./store";
-import { levels, getLevelPlayedId } from "./utils";
+import {
+  completeLevelPlayed,
+  createLevel,
+  createLevelPlayed,
+  createPlayer,
+  incrementLevelCompletions,
+  incrementLevelInstances,
+} from "./store";
+import { levelsToNumber } from "./utils";
 
 export function handleCreateLevelCall(call: CreateLevelInstanceCall): void {
   // Ignore calls to unexistent levels
-  if (!levels.isSet(call.inputs._level.toHex())) return;
+  if (!levelsToNumber.isSet(call.inputs._level.toHex())) return;
 
   createLevelPlayed(call.inputs._level, call.from, call.block.number);
   createPlayer(call.from);
+  createLevel(call.inputs._level);
+  incrementLevelInstances(call.inputs._level);
 }
 
 export function handleLevelCompletedEvent(event: LevelCompletedLog): void {
@@ -19,4 +28,5 @@ export function handleLevelCompletedEvent(event: LevelCompletedLog): void {
     event.params.player,
     event.block.number
   );
+  incrementLevelCompletions(event.params.level);
 }

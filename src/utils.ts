@@ -1,6 +1,6 @@
-import { Address, TypedMap } from "@graphprotocol/graph-ts";
+import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
-const orderedLevels = [
+const idToLevels = [
   "0x4E73b858fD5D7A5fc1c3455061dE52a53F35d966",
   "0x9CB391dbcD447E645D6Cb55dE6ca23164130D008",
   "0x5732B2F88cbd19B6f01E3a96e9f0D90B917281E5",
@@ -30,12 +30,12 @@ const orderedLevels = [
   "0x128BA32Ec698610f2fF8f010A7b74f9985a6D17c",
 ];
 
-const levels = orderedLevels.reduce((acc, address, index) => {
-  acc.set(address, index);
+const levelsToNumber = idToLevels.reduce((acc, address, index) => {
+  acc.set(address, BigInt.fromI32(index));
   return acc;
-}, new TypedMap<string, number>());
+}, new TypedMap<string, BigInt>());
 
 const getLevelPlayedId = (level: Address, player: Address): string =>
   `${level.toHex()}-${player.toHex()}`;
 
-export { levels, getLevelPlayedId };
+export { idToLevels, levelsToNumber, getLevelPlayedId };
