@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: Ethernaut
@@ -19,11 +19,11 @@ dataSources:
         - OwnershipTransferred
       abis:
         - name: Ethernaut
-          file: ./abis/Ethernaut.json
+          file: Ethernaut/abis/Ethernaut.json
       eventHandlers:
         - event: LevelCompletedLog(indexed address,address)
           handler: handleLevelCompletedEvent
       callHandlers:
         - function: createLevelInstance(address)
           handler: handleCreateLevelCall
-      file: ./src/mapping.ts
+      file: Ethernaut/Ethernaut.wasm

@@ -1,56 +1,40 @@
-import { BigInt } from "@graphprotocol/graph-ts"
 import {
-  Ethernaut,
   LevelCompletedLog,
-  LevelInstanceCreatedLog,
-  OwnershipTransferred
-} from "../generated/Ethernaut/Ethernaut"
-import { ExampleEntity } from "../generated/schema"
+  CreateLevelInstanceCall,
+} from "../generated/Ethernaut/Ethernaut";
+import { LevelPlayed, Player } from "../generated/schema";
+import { levels, getLevelPlayedId } from "./utils";
 
-export function handleLevelCompletedLog(event: LevelCompletedLog): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+export function handleCreateLevelCall(call: CreateLevelInstanceCall): void {
+  // Ignore calls to unexistent levels
+  if (!levels.isSet(call.inputs._level.toHex())) return;
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
+  // Given contract limitations, a user can create a new instance for an
+  // already started level, which may cause collisions.
+  // If that's the case, we keep the original one as the correct instance
+  const id = getLevelPlayedId(call.inputs._level, call.from);
+  if (LevelPlayed.load(id)) return;
 
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
+  const levelPlayed = new LevelPlayed(id);
+  levelPlayed.player = call.from.toHex();
+  levelPlayed.level = call.inputs._level;
+  levelPlayed.createdAt = call.block.number;
+  levelPlayed.save();
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.player = event.params.player
-  entity.level = event.params.level
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.owner(...)
+  let player = Player.load(call.from.toHex());
+  if (!player) player = new Player(call.from.toHex());
+  player.address = call.from;
+  player.save();
 }
 
-export function handleLevelInstanceCreatedLog(
-  event: LevelInstanceCreatedLog
-): void {}
+export function handleLevelCompletedEvent(event: LevelCompletedLog): void {
+  const id = getLevelPlayedId(event.params.level, event.params.player);
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+  const levelPlayed = LevelPlayed.load(id);
+
+  // Entity should exist !!
+  if (!levelPlayed) return;
+
+  levelPlayed.completedAt = event.block.number;
+  levelPlayed.save();
+}
