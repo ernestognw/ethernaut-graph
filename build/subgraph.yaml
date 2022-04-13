@@ -1,0 +1,29 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Ethernaut
+    network: rinkeby
+    source:
+      address: "0xD991431D8b033ddCb84dAD257f4821E9d5b38C33"
+      abi: Ethernaut
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - LevelCompletedLog
+        - LevelInstanceCreatedLog
+        - OwnershipTransferred
+      abis:
+        - name: Ethernaut
+          file: Ethernaut/abis/Ethernaut.json
+      eventHandlers:
+        - event: LevelCompletedLog(indexed address,address)
+          handler: handleLevelCompletedLog
+        - event: LevelInstanceCreatedLog(indexed address,address)
+          handler: handleLevelInstanceCreatedLog
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: Ethernaut/Ethernaut.wasm
