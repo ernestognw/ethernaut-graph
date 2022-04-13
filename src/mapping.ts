@@ -13,15 +13,7 @@ export function handleLevelCompletedLog(event: LevelCompletedLog): void {
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new CompletedLevel(event.transaction.from.toHex());
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0);
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = BigInt.fromI32(1).plus(entity.count);
+  if (!entity) entity = new CompletedLevel(event.transaction.from.toHex());
 
   // Entity fields can be set based on event parameters
   entity.player = event.params.player;
