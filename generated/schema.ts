@@ -18,6 +18,7 @@ export class CompletedLevel extends Entity {
 
     this.set("player", Value.fromBytes(Bytes.empty()));
     this.set("level", Value.fromBytes(Bytes.empty()));
+    this.set("completedAt", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -61,6 +62,15 @@ export class CompletedLevel extends Entity {
 
   set level(value: Bytes) {
     this.set("level", Value.fromBytes(value));
+  }
+
+  get completedAt(): BigInt {
+    let value = this.get("completedAt");
+    return value!.toBigInt();
+  }
+
+  set completedAt(value: BigInt) {
+    this.set("completedAt", Value.fromBigInt(value));
   }
 }
 
