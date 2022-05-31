@@ -2,6 +2,7 @@ type CompletedLevel @entity {
   id: ID!
   player: Bytes!
   level: Bytes!
+  completedAt: BigInt!
 }
 
 type CompletedLevelCount @entity {
