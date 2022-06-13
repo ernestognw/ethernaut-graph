@@ -19,6 +19,7 @@ export function handleLevelCompletedLog(event: LevelCompletedLog): void {
   // Entity fields can be set based on event parameters
   entity.player = event.params.player;
   entity.level = event.params.level;
+  entity.completedAt = event.block.number;
 
   // Entities can be written to the store with `.save()`
   entity.save();
