@@ -7,18 +7,18 @@ import {
 import { CompletedLevel, CompletedLevelCount } from "../generated/schema";
 
 export function handleLevelCompletedLog(event: LevelCompletedLog): void {
+  let id = `${event.transaction.from.toHex()}-${event.params.level.toHex()}`;
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
-  let entity = CompletedLevel.load(event.transaction.from.toHex());
+  let entity = CompletedLevel.load(id);
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
-  if (!entity) entity = new CompletedLevel(event.transaction.from.toHex());
+  if (!entity) entity = new CompletedLevel(id);
 
   // Entity fields can be set based on event parameters
   entity.player = event.params.player;
   entity.level = event.params.level;
-  entity.completedAt = event.block.number;
 
   // Entities can be written to the store with `.save()`
   entity.save();
